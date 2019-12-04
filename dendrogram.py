@@ -6,7 +6,7 @@ from seaborn import clustermap
 import math
 import matplotlib.pyplot as plt
 
-plt.rcParams.update({'font.size': 22})
+plt.rcParams.update({'font.size': 26})
 
 parser = argparse.ArgumentParser(description='Generate dendrogram by taxonomy')
 parser.add_argument('samples', metavar='N', nargs='+',
@@ -26,8 +26,8 @@ for f in args.samples:
 	for line in open(f):
 		perc, cnt, uniq, rank, ncbi, name = line.strip().split("\t")
 		name = name.strip()
-		total += float(uniq)
-		if rank == 'S':
+		if int(cnt) == int(uniq) and (rank == 'S' or rank == '-'):
+			total += float(uniq)
 			if name not in dat:
 				dat[name] = {}
 			dat[name][samp] = float(uniq)
@@ -41,6 +41,9 @@ df = df.drop('total', axis=1)
 df.loc['sum'] = df.sum(axis=0)
 df = df.sort_values('sum', axis = 1, ascending=False)
 df = df.drop('sum', axis=0)
+
+df.to_csv(args.output + ".csv")
+
 if args.count > 0:
 	df = df.iloc[:, :args.count]
 else:
@@ -49,5 +52,7 @@ else:
 
 g = clustermap(data=df, metric='braycurtis', col_cluster=False, robust=True, figsize=(2*(5*math.log(max(10,args.count))), 2*(5+len(args.samples))))
 plt.setp(g.ax_heatmap.yaxis.get_majorticklabels(), rotation=0, va='center')
+if args.count > 50:
+    g.ax_heatmap.get_xaxis().set_visible(False)
 g.cax.set_visible(False)
 g.savefig(args.output + ".png")
