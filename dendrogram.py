@@ -6,13 +6,13 @@ from seaborn import clustermap
 import math
 import matplotlib.pyplot as plt
 
-plt.rcParams.update({'font.size': 26})
+plt.rcParams['svg.fonttype'] = 'none'
 
 parser = argparse.ArgumentParser(description='Generate dendrogram by taxonomy')
 parser.add_argument('samples', metavar='N', nargs='+',
                     help='files with taxonomy of samples')
 parser.add_argument('-c', dest='count', default = -1, type = int,
-                    help='Number of most abundant taxons to use (default: all)')
+                    help='Number of most abundant taxons to use (default: all). Names will be shown if count <= 50')
 parser.add_argument('-o', dest='output', default = "dendrogram",
                     help='File to save dendrogram to (default: dendrogam.png)')
 args = parser.parse_args()
@@ -49,10 +49,16 @@ if args.count > 0:
 else:
 	args.count = df.shape[1]
 
-
-g = clustermap(data=df, metric='braycurtis', col_cluster=False, robust=True, figsize=(2*(5*math.log(max(10,args.count))), 2*(5+len(args.samples))))
-plt.setp(g.ax_heatmap.yaxis.get_majorticklabels(), rotation=0, va='center')
+sz = min(50, max(args.count, len(args.samples)))
+g = clustermap(data=df, metric='braycurtis', col_cluster=False, robust=True, figsize=(sz+5, sz))
 if args.count > 50:
     g.ax_heatmap.get_xaxis().set_visible(False)
 g.cax.set_visible(False)
+plt.setp(g.ax_heatmap.xaxis.get_majorticklabels(), fontsize=min(100, 40 * sz // args.count))
+plt.setp(g.ax_heatmap.yaxis.get_majorticklabels(), fontsize=min(100, 40 * sz // len(args.samples)))
+plt.setp(g.ax_heatmap.yaxis.get_majorticklabels(), rotation=0, va='center')
+plt.setp(g.ax_heatmap.xaxis.get_majorticklabels(), rotation=90)
+for a in g.ax_row_dendrogram.collections:
+    a.set_linewidth(5)
+g.savefig(args.output + ".svg")
 g.savefig(args.output + ".png")
