@@ -49,16 +49,15 @@ if args.count > 0:
 else:
 	args.count = df.shape[1]
 
-sz = min(50, max(args.count, len(args.samples)))
+sz = min(50, max(args.count, len(args.samples))) // 5
 g = clustermap(data=df, metric='braycurtis', col_cluster=False, robust=True, figsize=(sz+5, sz))
 if args.count > 50:
-    g.ax_heatmap.get_xaxis().set_visible(False)
-g.cax.set_visible(False)
+	g.ax_heatmap.get_xaxis().set_visible(False)
 plt.setp(g.ax_heatmap.xaxis.get_majorticklabels(), fontsize=min(100, 40 * sz // args.count))
 plt.setp(g.ax_heatmap.yaxis.get_majorticklabels(), fontsize=min(100, 40 * sz // len(args.samples)))
 plt.setp(g.ax_heatmap.yaxis.get_majorticklabels(), rotation=0, va='center')
 plt.setp(g.ax_heatmap.xaxis.get_majorticklabels(), rotation=90)
 for a in g.ax_row_dendrogram.collections:
-    a.set_linewidth(5)
+	a.set_linewidth(2)
 g.savefig(args.output + ".svg")
 g.savefig(args.output + ".png")
