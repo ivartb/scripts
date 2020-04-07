@@ -23,7 +23,6 @@ dat['total'] = {}
 for f in args.samples:
 	samp = f[:-4]
 	total = 0.
-	tmp = pd.DataFrame(columns = ["percentage", "covered", "rank", "ncbi_id"])
 	for line in open(f):
 		perc, cnt, uniq, rank, ncbi, name = line.strip().split("\t")
 		name = name.strip()
@@ -32,15 +31,14 @@ for f in args.samples:
 			if name not in dat:
 				dat[name] = {}
 			dat[name][samp] = float(uniq)
-			tmp.loc[name] = [float(perc), int(cnt), rank, ncbi]
 	dat['total'][samp] = total
-	tmp.to_csv(samp + ".txt", sep="\t")
 
 
 df = pd.DataFrame(data=dat, dtype=float)
 df = df.fillna(0)
 
-df.drop("total", axis=1).reindex(sorted(df.columns), axis=1).to_csv(args.output + ".txt", sep="\t", float_format='%.f')
+tmp = df.drop(columns=["total"])
+tmp.reindex(sorted(tmp.columns), axis=1).to_csv(args.output + ".txt", sep="\t", float_format='%.f')
 
 df = df.apply(lambda x: x/x.max(), axis=1)
 df = df.drop('total', axis=1)
