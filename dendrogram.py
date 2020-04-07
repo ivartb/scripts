@@ -39,6 +39,9 @@ for f in args.samples:
 
 df = pd.DataFrame(data=dat, dtype=float)
 df = df.fillna(0)
+
+df.drop("total", axis=1).reindex(sorted(df.columns), axis=1).to_csv(args.output + ".txt", sep="\t", float_format='%.f')
+
 df = df.apply(lambda x: x/x.max(), axis=1)
 df = df.drop('total', axis=1)
 df.loc['sum'] = df.sum(axis=0)
@@ -46,7 +49,6 @@ df = df.sort_values('sum', axis = 1, ascending=False)
 df = df.drop('sum', axis=0)
 
 df.to_csv(args.output + ".csv")
-df.to_csv(args.output + ".txt", sep="\t")
 
 if args.count > 0:
 	df = df.iloc[:, :args.count]
