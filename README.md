@@ -8,13 +8,16 @@ Script for building a dendrogram for environmental metagenomic samples based on 
 2. Run ``centrifuge-kreport`` to get output taxonomy in [kraken-format](https://github.com/DerrickWood/kraken2/blob/master/docs/MANUAL.markdown#sample-report-output-format)
 3. Run dendrogram.py to build image with dendrogram
 ```
-python3 dendrogram.py [-c COUNT] [-o OUTPUT] N [N ...]
+python3 dendrogram.py [-c COUNT] [-o OUTPUT] (-s N [N ...] | -t table)
 ```
-```N``` — files with taxonomy of samples from step 2
-
-```-c COUNT``` — Number of most abundant taxons to use (default: all)
+```-c COUNT``` — Number of most abundant taxons to use (default: all). Names will be shown if count <= 50
 
 ```-o OUTPUT``` — File to save dendrogram to (default: dendrogam.png)
+
+```-s N [N ...]``` — files with taxonomy of samples from step 2
+
+``` -t table``` — one tabular file with taxonomy of samples
+
 
 It is recommended to set ```c``` parameter less than 100 for better visualisation.
 
